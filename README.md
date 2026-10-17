@@ -1,1 +1,1 @@
-﻿# ECS Fargate Microservices
+﻿# Serverless Image Processing Pipeline (S3, SQS, Lambda)
