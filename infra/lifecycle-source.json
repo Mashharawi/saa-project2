@@ -1,0 +1,10 @@
+{
+  "Rules": [
+    {
+      "ID": "expire-raw-uploads",
+      "Status": "Enabled",
+      "Filter": {},
+      "Expiration": { "Days": 1 }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+    "QueueConfigurations":  [
+                                {
+                                    "Events":  [
+                                                   "s3:ObjectCreated:*"
+                                               ],
+                                    "QueueArn":  "arn:aws:sqs:us-east-1:121312796739:image-pipeline-queue"
+                                }
+                            ]
+}

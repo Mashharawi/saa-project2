@@ -1,0 +1,3 @@
+{
+    "Policy":  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"s3.amazonaws.com\"},\"Resource\":\"arn:aws:sqs:us-east-1:121312796739:image-pipeline-queue\",\"Condition\":{\"ArnLike\":{\"aws:SourceArn\":\"arn:aws:s3:::saa-p2-source-121312796739\"},\"StringEquals\":{\"aws:SourceAccount\":\"121312796739\"}},\"Action\":\"sqs:SendMessage\"}]}"
+}
