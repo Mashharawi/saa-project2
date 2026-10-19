@@ -14,6 +14,12 @@
       "Resource": "arn:aws:s3:::saa-p2-processed-121312796739/*"
     },
     {
+      "Sid": "ReadAndDeleteWorkFiles",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::saa-p2-processed-121312796739/work/*"
+    },
+    {
       "Sid": "MetadataTable",
       "Effect": "Allow",
       "Action": ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem"],

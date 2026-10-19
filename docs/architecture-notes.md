@@ -112,3 +112,69 @@ Region: us-east-1
 - دوران يُبقيان كل دالة بأقل صلاحية. لا عبارة تستخدم مورد wildcard.
 - كلاهما يثق بـ lambda.amazonaws.com فقط. سيُنشأ دور Step Functions
   في الخطوة 8.
+
+  ## Step 6: IAM Roles
+
+- image-processor-role: CloudWatch Logs (managed policy) plus an inline
+  policy: s3:GetObject on the source bucket, s3:PutObject on the
+  processed bucket, DynamoDB Put/Update/GetItem on image-metadata,
+  sns:Publish on the notifications topic, and SQS
+  Receive/Delete/GetQueueAttributes on the main queue (the Lambda SQS
+  trigger polls using this role).
+- image-presign-role: CloudWatch Logs plus s3:PutObject on the source
+  bucket only. A pre-signed URL carries the permissions of the role that
+  signed it, so this is the maximum an uploader can do.
+- Two roles keep each function at least privilege. No statement uses a
+  wildcard resource.
+- Both trust only lambda.amazonaws.com. The Step Functions role will be
+  created in Step 8.
+
+  ## الخطوة 6: أدوار IAM
+
+- image-processor-role: سجلات CloudWatch (سياسة مُدارة) مع سياسة
+  مضمّنة: s3:GetObject على حاوية المصدر، وs3:PutObject على حاوية
+  الوجهة، وPut/Update/GetItem في DynamoDB على image-metadata،
+  وsns:Publish على موضوع الإشعارات، وReceive/Delete/GetQueueAttributes
+  في SQS على الطابور الرئيسي (مشغّل SQS في Lambda يستطلع بهذا الدور).
+- image-presign-role: سجلات CloudWatch مع s3:PutObject على حاوية
+  المصدر فقط. الرابط الموقّع يحمل صلاحيات الدور الذي وقّعه، فهذا أقصى
+  ما يستطيعه من يرفع.
+- دوران يُبقيان كل دالة بأقل صلاحية. لا عبارة تستخدم مورد wildcard.
+- كلاهما يثق بـ lambda.amazonaws.com فقط. سيُنشأ دور Step Functions
+  في الخطوة 8.
+
+  ## Step 7: Processor Lambda
+
+- Layer pillow-py312 (Pillow built inside the Lambda Python 3.12 Docker
+  image so the binaries match the Lambda runtime).
+- Function image-processor: Python 3.12, 1024 MB, 30 s timeout. The SQS
+  event source mapping uses batch size 1; the queue's 60 s visibility
+  timeout is longer than the function timeout.
+- Steps: validate (size, format, pixel limits) -> resize (full 1280 px
+  and 256 px thumbnail) -> watermark -> store (DynamoDB COMPLETED + SNS).
+  Steps hand off through S3 and DynamoDB, so the same code can later run
+  under Step Functions.
+- Permanent errors (invalid file) are marked FAILED and reported by SNS
+  without retrying. Transient errors are re-raised: SQS retries, and
+  after 3 receives the message goes to the DLQ.
+- imageId is a hash of bucket, key and S3 sequencer, so redelivered
+  messages update the same DynamoDB item (idempotent).
+- Outputs: images/<id>.jpg and thumbnails/<id>.jpg in the processed bucket.
+
+## الخطوة 7: دالة Lambda للمعالجة
+
+- الطبقة pillow-py312 (بُنيت Pillow داخل صورة Docker الخاصة بـ Lambda
+  Python 3.12 لتطابق الملفات الثنائية بيئة التشغيل).
+- الدالة image-processor: Python 3.12، ذاكرة 1024 ميغابايت، مهلة 30
+  ثانية. ربط مصدر أحداث SQS بحجم دفعة 1؛ ومهلة رؤية الطابور (60 ثانية)
+  أطول من مهلة الدالة.
+- الخطوات: تحقق (الحجم والصيغة وحد البكسلات) ← تغيير الحجم (1280
+  بكسل ومصغّرة 256 بكسل) ← علامة مائية ← تخزين (DynamoDB بحالة
+  COMPLETED وإشعار SNS). تتسلّم الخطوات العمل عبر S3 وDynamoDB، فيمكن
+  لنفس الكود أن يعمل لاحقًا تحت Step Functions.
+- الأخطاء الدائمة (ملف غير صالح) تُسجَّل FAILED ويُرسل SNS إشعارها دون
+  إعادة محاولة. الأخطاء العابرة تُعاد: يعيد SQS المحاولة، وبعد 3
+  استقبالات تذهب الرسالة إلى الـ DLQ.
+- imageId هو تجزئة للحاوية والمفتاح ومُسلسِل S3، فتحدّث الرسائل المُعاد
+  تسليمها نفس عنصر DynamoDB (آمنة عند التكرار).
+- المخرجات: images/<id>.jpg وthumbnails/<id>.jpg في حاوية الوجهة.
