@@ -165,7 +165,12 @@ def fail(event):
     """Permanent failure: record it and tell the subscriber."""
     reason = event.get("error", "unknown error")
     if isinstance(reason, dict):            # Step Functions Catch output
-        reason = reason.get("Cause") or reason.get("Error") or str(reason)
+        cause = reason.get("Cause") or ""
+        try:                                # Cause is JSON text from the failed Lambda
+            parsed = json.loads(cause)
+            reason = parsed.get("errorMessage", cause) if isinstance(parsed, dict) else cause
+        except ValueError:
+            reason = cause or reason.get("Error", "unknown error")
     table.update_item(
         Key={"imageId": event["imageId"]},
         UpdateExpression="SET #s = :s, errorMessage = :e, completedTime = :c, sourceKey = :k",

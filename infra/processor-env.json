@@ -1,1 +1,1 @@
-{"Variables": {"PROCESSED_BUCKET": "saa-p2-processed-121312796739", "TABLE_NAME": "image-metadata", "TOPIC_ARN": "arn:aws:sns:us-east-1:121312796739:image-pipeline-notifications", "WATERMARK_TEXT": "SAA Project 2"}}
+{"Variables": {"PROCESSED_BUCKET": "saa-p2-processed-121312796739", "TABLE_NAME": "image-metadata", "TOPIC_ARN": "arn:aws:sns:us-east-1:121312796739:image-pipeline-notifications", "WATERMARK_TEXT": "SAA Project 2", "STATE_MACHINE_ARN": "arn:aws:states:us-east-1:121312796739:stateMachine:image-pipeline"}}

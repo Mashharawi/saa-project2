@@ -1,0 +1,198 @@
+{
+  "Comment": "Image processing workflow: validate, resize, watermark, store",
+  "StartAt": "Validate",
+  "States": {
+    "Validate": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:121312796739:function:image-processor",
+        "Payload": {
+          "step": "validate",
+          "imageId.$": "$.imageId",
+          "bucket.$": "$.bucket",
+          "key.$": "$.key"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "ValidationError"
+          ],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Next": "Resize"
+    },
+    "Resize": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:121312796739:function:image-processor",
+        "Payload": {
+          "step": "resize",
+          "imageId.$": "$.imageId",
+          "bucket.$": "$.bucket",
+          "key.$": "$.key",
+          "width.$": "$.width",
+          "height.$": "$.height",
+          "format.$": "$.format"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "ValidationError"
+          ],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Next": "Watermark"
+    },
+    "Watermark": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:121312796739:function:image-processor",
+        "Payload": {
+          "step": "watermark",
+          "imageId.$": "$.imageId",
+          "bucket.$": "$.bucket",
+          "key.$": "$.key",
+          "width.$": "$.width",
+          "height.$": "$.height",
+          "format.$": "$.format"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "ValidationError"
+          ],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Next": "Store"
+    },
+    "Store": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:121312796739:function:image-processor",
+        "Payload": {
+          "step": "store",
+          "imageId.$": "$.imageId",
+          "bucket.$": "$.bucket",
+          "key.$": "$.key",
+          "width.$": "$.width",
+          "height.$": "$.height",
+          "format.$": "$.format"
+        }
+      },
+      "OutputPath": "$.Payload",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "ValidationError"
+          ],
+          "MaxAttempts": 0
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Next": "Done"
+    },
+    "Done": {
+      "Type": "Succeed"
+    },
+    "NotifyFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:121312796739:function:image-processor",
+        "Payload": {
+          "step": "fail",
+          "imageId.$": "$.imageId",
+          "key.$": "$.key",
+          "error.$": "$.error"
+        }
+      },
+      "ResultPath": null,
+      "Next": "Failed"
+    },
+    "Failed": {
+      "Type": "Fail",
+      "Error": "ImageProcessingFailed",
+      "Cause": "See the image-metadata table for the reason"
+    }
+  }
+}

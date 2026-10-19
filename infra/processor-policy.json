@@ -1,41 +1,58 @@
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "ReadSourceImages",
-      "Effect": "Allow",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::saa-p2-source-121312796739/*"
-    },
-    {
-      "Sid": "WriteProcessedImages",
-      "Effect": "Allow",
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::saa-p2-processed-121312796739/*"
-    },
-    {
-      "Sid": "ReadAndDeleteWorkFiles",
-      "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:DeleteObject"],
-      "Resource": "arn:aws:s3:::saa-p2-processed-121312796739/work/*"
-    },
-    {
-      "Sid": "MetadataTable",
-      "Effect": "Allow",
-      "Action": ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem"],
-      "Resource": "arn:aws:dynamodb:us-east-1:121312796739:table/image-metadata"
-    },
-    {
-      "Sid": "PublishNotifications",
-      "Effect": "Allow",
-      "Action": "sns:Publish",
-      "Resource": "arn:aws:sns:us-east-1:121312796739:image-pipeline-notifications"
-    },
-    {
-      "Sid": "ConsumeQueue",
-      "Effect": "Allow",
-      "Action": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
-      "Resource": "arn:aws:sqs:us-east-1:121312796739:image-pipeline-queue"
-    }
-  ]
+    "Version":  "2012-10-17",
+    "Statement":  [
+                      {
+                          "Sid":  "ReadSourceImages",
+                          "Effect":  "Allow",
+                          "Action":  "s3:GetObject",
+                          "Resource":  "arn:aws:s3:::saa-p2-source-121312796739/*"
+                      },
+                      {
+                          "Sid":  "WriteProcessedImages",
+                          "Effect":  "Allow",
+                          "Action":  "s3:PutObject",
+                          "Resource":  "arn:aws:s3:::saa-p2-processed-121312796739/*"
+                      },
+                      {
+                          "Sid":  "ReadAndDeleteWorkFiles",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "s3:GetObject",
+                                         "s3:DeleteObject"
+                                     ],
+                          "Resource":  "arn:aws:s3:::saa-p2-processed-121312796739/work/*"
+                      },
+                      {
+                          "Sid":  "MetadataTable",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "dynamodb:PutItem",
+                                         "dynamodb:UpdateItem",
+                                         "dynamodb:GetItem"
+                                     ],
+                          "Resource":  "arn:aws:dynamodb:us-east-1:121312796739:table/image-metadata"
+                      },
+                      {
+                          "Sid":  "PublishNotifications",
+                          "Effect":  "Allow",
+                          "Action":  "sns:Publish",
+                          "Resource":  "arn:aws:sns:us-east-1:121312796739:image-pipeline-notifications"
+                      },
+                      {
+                          "Sid":  "ConsumeQueue",
+                          "Effect":  "Allow",
+                          "Action":  [
+                                         "sqs:ReceiveMessage",
+                                         "sqs:DeleteMessage",
+                                         "sqs:GetQueueAttributes"
+                                     ],
+                          "Resource":  "arn:aws:sqs:us-east-1:121312796739:image-pipeline-queue"
+                      },
+                      {
+                          "Sid":  "StartWorkflow",
+                          "Effect":  "Allow",
+                          "Action":  "states:StartExecution",
+                          "Resource":  "arn:aws:states:us-east-1:121312796739:stateMachine:image-pipeline"
+                      }
+                  ]
 }
