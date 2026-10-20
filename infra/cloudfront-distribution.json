@@ -1,0 +1,28 @@
+{
+  "CallerReference": "image-pipeline-2026-10",
+  "Comment": "Serves processed images from the private bucket",
+  "Enabled": true,
+  "PriceClass": "PriceClass_100",
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "processed-bucket",
+        "DomainName": "saa-p2-processed-121312796739.s3.us-east-1.amazonaws.com",
+        "OriginAccessControlId": "E6FVQJ3YQ4S5X",
+        "S3OriginConfig": { "OriginAccessIdentity": "" }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "processed-bucket",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["GET", "HEAD"],
+      "CachedMethods": { "Quantity": 2, "Items": ["GET", "HEAD"] }
+    },
+    "Compress": true,
+    "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "Name": "image-pipeline-oac",
+  "Description": "OAC for the processed images bucket",
+  "SigningProtocol": "sigv4",
+  "SigningBehavior": "always",
+  "OriginAccessControlOriginType": "s3"
+}

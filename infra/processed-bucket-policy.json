@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontReadOnly",
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::saa-p2-processed-121312796739/images/*",
+        "arn:aws:s3:::saa-p2-processed-121312796739/thumbnails/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::121312796739:distribution/E2RBEFP3B91VH7"
+        }
+      }
+    }
+  ]
+}
