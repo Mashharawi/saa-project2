@@ -89,6 +89,11 @@ load balancers.
 | Fetch an image through CloudFront twice | `x-cache: Hit from cloudfront` with an `Age` header |
 | Fetch the S3 URL directly, or `/work/*`, `/deploy/*` via CloudFront | `403` |
 
+Execution graphs:
+
+| Success | Failure |
+|---|---|
+| ![Successful execution](docs/execution-success.png) | ![Failed execution](docs/execution-failed.png) |
 ## Try it
 
 ```bash
@@ -117,8 +122,9 @@ at 1024 MB only where image decoding needs it, 1-day expiry on raw uploads.
 .
 ├── README.md
 ├── docs/
-│   ├── architecture.png        solution architecture diagram
-│   └── architecture-notes.md   step-by-step build log and decisions
+│   │   ├── architecture.png        solution architecture diagram
+│       ├──  architecture-notes.md   step-by-step build log and decisions
+│       └── execution-*.png         Step Functions execution graphsdecisions
 ├── lambdas/
 │   ├── processor/lambda_function.py   validate / resize / watermark / store / fail
 │   └── presign/lambda_function.py     pre-signed URL generator
